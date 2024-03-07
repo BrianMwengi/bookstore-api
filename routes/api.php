@@ -15,17 +15,28 @@ use App\Http\Controllers\Api\BookController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-
-Route::resource('books', BookController::class)->except(['create', 'edit']);
-
-// routes/api.php or a separate auth.php file
-
+// Authentication routes
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);   
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum'); // Protected route
 });
+
+// Global authentication for API routes
+Route::middleware('auth:sanctum')->group(function () { 
+
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    // Bookstore API routes
+    Route::resource('books', BookController::class)->except(['create', 'edit']);
+
+    // Other API routes requiring general authentication go here...
+
+    // Admin-only routes
+    Route::middleware('CheckRole:admin')->group(function() {
+        // Routes accessible only by admins (e.g., POST /books, PUT /books/{id}, DELETE /books/{id} )
+    });
+});
+
