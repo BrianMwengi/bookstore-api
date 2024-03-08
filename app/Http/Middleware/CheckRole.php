@@ -15,10 +15,14 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!in_array($request->user()->role, $roles)) {
+        // Check if the authenticated user's role is within the allowed roles
+        if (!in_array($request->user()->role, $roles)) {  
+            // User's role is not authorized, return an error response
             return response()->json(['error' => 'Unauthorized'], 403);  
         }
-
-        return $next($request);
+    
+        // User's role is authorized, proceed to the next middleware or controller
+        return $next($request); 
     }
+    
 }
